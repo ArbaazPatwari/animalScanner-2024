@@ -115,7 +115,22 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: _saveMetadata,
               child: const Text('Save Metadata'),
             ),
-            // Placeholder for displaying saved metadata
+            SizedBox(height: 16),
+            // Expanded widget for displaying saved metadata
+            Expanded(
+              child: ListView.builder(
+                itemCount: metadataList.length,
+                itemBuilder: (context, index) {
+                  final item = metadataList[index];
+                  return ListTile(
+                    title: Text(
+                        'Length: ${item['Length']}, Weight: ${item['Weight']}'),
+                    subtitle: Text(
+                        'Location: ${item['Location']}, Time: ${item['Time']}'),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -126,4 +141,5 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
 }
