@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Animal Scanner Home'),
+      home: const MyHomePage(title: 'Animal Scanner Home Page'),
     );
   }
 }
@@ -32,20 +34,50 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+List<Map<String, String>> metadataList = [];
+
+
 class _MyHomePageState extends State<MyHomePage> {
   File? _image;
+  final TextEditingController _lengthController = TextEditingController();
+  final TextEditingController _weightController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _timeController = TextEditingController();
 
-  // Function to pick an image from the gallery
   Future<void> _pickImage() async {
     final pickedFile =
-        await ImagePicker().getImage(source: ImageSource.gallery);
-
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
     }
   }
+
+  void _saveMetadata() {
+    final metadata = {
+      'Length': _lengthController.text,
+      'Weight': _weightController.text,
+      'Location': _locationController.text,
+      'Time': _timeController.text,
+    };
+
+    setState(() {
+      metadataList.add(metadata);
+    });
+
+    // Print the current metadata list
+    if (kDebugMode) {
+      print(metadataList);
+    }
+
+    // Clear the input fields
+    _lengthController.clear();
+    _weightController.clear();
+    _locationController.clear();
+    _timeController.clear();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,30 +86,43 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: const Text('Import Photo from Gallery'),
+            // Input fields for metadata
+            TextField(
+              controller: _lengthController,
+              decoration: InputDecoration(labelText: 'Length (cm)'),
+              keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Add functionality for viewing identified animals later
-              },
-              child: const Text('View Identified Animals'),
+            TextField(
+              controller: _weightController,
+              decoration: InputDecoration(labelText: 'Weight (g)'),
+              keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 20),
-            if (_image != null)
-              Image.file(
-                _image!,
-                height: 200,
-                width: 200,
-              ),
+            TextField(
+              controller: _locationController,
+              decoration: InputDecoration(labelText: 'Location'),
+            ),
+            TextField(
+              controller: _timeController,
+              decoration: InputDecoration(labelText: 'Time'),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _saveMetadata,
+              child: const Text('Save Metadata'),
+            ),
+            // Placeholder for displaying saved metadata
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {}, // Placeholder for future functionality
+        tooltip: 'Placeholder',
+        child: const Icon(Icons.add),
       ),
     );
   }
